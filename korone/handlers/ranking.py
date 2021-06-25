@@ -131,6 +131,11 @@ async def ranking_notify(c: Korone, m: Message):
 
 @Korone.on_callback_query(filters.regex("^rank_togle"))
 async def rank_togle(c: Korone, cq: CallbackQuery):
+    member = await c.get_chat_member(
+        chat_id=cq.message.chat.id, user_id=cq.from_user.id
+    )
+    if member.status not in ["administrator", "creator"]:
+        return await cq.answer("Este botão não é para você!", cache_time=60)
     config = await Rank_not.get_or_none(chat_id=cq.message.chat.id)
     if config.value == "True":
         config.update_from_dict({"value": False})
