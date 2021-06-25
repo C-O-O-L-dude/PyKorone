@@ -53,7 +53,9 @@ with open("korone/levels_global.json", "r") as file:
 
 
 @Korone.on_message(
-    filters.cmd(command=r"ranking$", action="Ranking do grupo.", group=GROUP)
+    filters.cmd(
+        command=r"ranking$", action="Ranking de usuários do grupo.", group=GROUP
+    )
     & filters.group
 )
 async def ranking(c: Korone, m: Message):
@@ -66,7 +68,7 @@ async def ranking(c: Korone, m: Message):
     text = f"Ranking de níveis de <b>{html.escape(m.chat.title)}</b>:"
 
     for index, level in enumerate(user_levels):
-        if (index + 1) >= 50:
+        if (index + 1) >= 20:
             break
 
         first_name = (await Users.get(id=level.user_id)).first_name
@@ -86,7 +88,9 @@ async def ranking(c: Korone, m: Message):
 
 
 @Korone.on_message(
-    filters.cmd(command=r"ranking global$", action="Ranking global.", group=GROUP)
+    filters.cmd(
+        command=r"ranking global$", action="Ranking de usuários global.", group=GROUP
+    )
 )
 async def ranking_global(c: Korone, m: Message):
     users = sorted(await Users.all(), key=lambda user: user.level, reverse=True)
@@ -94,7 +98,7 @@ async def ranking_global(c: Korone, m: Message):
     text = f"Ranking de níveis <b>global</b>:"
 
     for index, user in enumerate(users):
-        if (index + 1) >= 50:
+        if (index + 1) >= 20:
             break
 
         first_name = user.first_name
