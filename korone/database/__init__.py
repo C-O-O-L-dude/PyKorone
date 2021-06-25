@@ -26,6 +26,11 @@ class Chats(Model):
     username = fields.CharField(max_length=32, default="")
 
 
+class Rank_not(Model):
+    chat_id = fields.IntField(pk=True)
+    value = fields.CharField(max_length=255, default="False")
+
+
 class Users(Model):
     id = fields.IntField(pk=True)
     first_name = fields.TextField()
