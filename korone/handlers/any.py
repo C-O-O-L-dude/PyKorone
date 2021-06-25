@@ -91,7 +91,7 @@ async def on_all_m(c: Korone, m: Message):
 
 
 @aiowrap
-@Korone.on_message(~filters.private & filters.text, group=5)
+@Korone.on_message(~filters.private & ~filters.edited & filters.text, group=5)
 async def on_text_m(c: Korone, m: Message):
     length = len(m.text)
     await Rank_not.get_or_create(chat_id=m.chat.id)

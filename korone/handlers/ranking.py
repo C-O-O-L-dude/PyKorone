@@ -68,7 +68,7 @@ async def ranking(c: Korone, m: Message):
     text = f"Ranking de níveis de <b>{html.escape(m.chat.title)}</b>:"
 
     for index, level in enumerate(user_levels):
-        if (index + 1) >= 20:
+        if (index + 1) >= 21:
             break
 
         first_name = (await Users.get(id=level.user_id)).first_name
@@ -98,7 +98,7 @@ async def ranking_global(c: Korone, m: Message):
     text = f"Ranking de níveis <b>global</b>:"
 
     for index, user in enumerate(users):
-        if (index + 1) >= 20:
+        if (index + 1) >= 21:
             break
 
         first_name = user.first_name
