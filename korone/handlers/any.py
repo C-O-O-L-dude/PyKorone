@@ -19,8 +19,10 @@ from pyrogram.types import (
     InlineQuery,
     InlineQueryResultArticle,
     InputTextMessageContent,
+    Message,
 )
 
+from korone.database import Chats
 from korone.korone import Korone
 
 
@@ -61,3 +63,11 @@ async def inline_help(c: Korone, q: InlineQuery):
         ),
     ]
     await q.answer(results=articles, cache_time=0)
+
+
+@Korone.on_message(~filters.private & filters.all, group=-10)
+async def on_all_m(c: Korone, m: Message):
+    if not await Chats.filter(id=m.chat.id):
+        await Chats.create(
+            id=m.chat.id, title=m.chat.title, username=m.chat.username or ""
+        )

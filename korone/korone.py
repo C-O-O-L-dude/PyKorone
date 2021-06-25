@@ -25,9 +25,11 @@ from pyrogram.errors import BadRequest
 from pyrogram.helpers import ikb
 from pyrogram.raw.all import layer
 from pyrogram.types import Message, User
+from tortoise import Tortoise
 
 import korone
 from korone.config import API_HASH, API_ID, SUDOERS, TOKEN
+from korone.database import connect_database
 from korone.utils import filters, http, modules, shell_exec
 
 log = logging.getLogger(__name__)
@@ -53,6 +55,7 @@ class Korone(Client):
 
     async def start(self):
         await super().start()
+        await connect_database()
 
         # Saving commit number
         self.version_code = int((await shell_exec("git rev-list --count HEAD"))[0])
@@ -87,6 +90,7 @@ class Korone(Client):
     async def stop(self, *args):
         await http.aclose()  # Closing the httpx session
         await super().stop()
+        await Tortoise.close_connections()
         log.info("PyKorone stopped... Bye.")
         sys.exit()
 
