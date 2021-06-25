@@ -22,7 +22,7 @@ import random
 import shutil
 import string
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List
 
 import regex
@@ -37,6 +37,7 @@ from pyrogram.types import (
 )
 
 from korone.config import SUDOERS, SW_API
+from korone.database import Levels, Users, XPs
 from korone.handlers import COMMANDS_HELP
 from korone.handlers.utils.reddit import bodyfetcher, imagefetcher, titlefetcher
 from korone.korone import Korone
@@ -71,6 +72,7 @@ async def ping(c: Korone, m: Message):
 )
 async def user_info(c: Korone, m: Message):
     args = m.matches[0]["text"]
+    now_date = datetime.now().replace(tzinfo=timezone.utc)
 
     try:
         if args:
@@ -83,6 +85,24 @@ async def user_info(c: Korone, m: Message):
         return await m.reply_text(f"<b>Error!</b>\n<code>{e}</code>")
     except IndexError:
         return await m.reply_text("Isso não me parece ser um usuário!")
+
+    user_db = (
+        await Users.get_or_create(
+            {
+                "first_name": user.first_name,
+                "last_name": user.last_name or "",
+                "username": user.username or "",
+                "last_update": now_date,
+            },
+            id=user.id,
+        )
+    )[0]
+    xp_db = (await XPs.get_or_create({"value": 0}, chat_id=m.chat.id, user_id=user.id))[
+        0
+    ]
+    level_db = (
+        await Levels.get_or_create({"value": 1}, chat_id=m.chat.id, user_id=user.id)
+    )[0]
 
     text = "<b>Informações do usuário</b>:"
     text += f"\nID: <code>{user.id}</code>"
@@ -104,6 +124,13 @@ async def user_info(c: Korone, m: Message):
         text += f"\nDatacenter: <code>{user.dc_id}</code>"
     if user.language_code:
         text += f"\nIdioma: <code>{user.language_code}</code>"
+
+    text += f"\n\nNível:\nGlobal: <code>{user_db.level}</code>"
+    if m.chat.type in ["group", "supergroup"]:
+        text += f" | Grupo: <code>{level_db.value}</code>"
+    text += f"\nXP:\nGlobal: <code>{user_db.xp}</code>"
+    if m.chat.type in ["group", "supergroup"]:
+        text += f" | Grupo: <code>{xp_db.value}</code>"
 
     bio = (await c.get_chat(chat_id=user.id)).bio
     if bio:

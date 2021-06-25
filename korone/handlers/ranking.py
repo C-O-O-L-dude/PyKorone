@@ -84,7 +84,7 @@ async def ranking(c: Korone, m: Message):
 
         text += f"\n    <i>#{index + 1}</i> {html.escape(first_name)} <b>{current_level}</b> (<code>{current_xp}</code>/<code>{next_level_xp}</code>)"
 
-    await m.reply_text(text)
+    await m.reply_text(text, disable_web_page_preview=True)
 
 
 @Korone.on_message(
@@ -95,7 +95,7 @@ async def ranking(c: Korone, m: Message):
 async def ranking_global(c: Korone, m: Message):
     users = sorted(await Users.all(), key=lambda user: user.level, reverse=True)
 
-    text = f"Ranking de níveis <b>global</b>:"
+    text = "Ranking de níveis <b>global</b>:"
 
     for index, user in enumerate(users):
         if (index + 1) >= 21:
@@ -114,7 +114,7 @@ async def ranking_global(c: Korone, m: Message):
 
         text += f"\n    <i>#{index + 1}</i> {html.escape(first_name)} <b>{current_level}</b> (<code>{current_xp}</code>/<code>{next_level_xp}</code>)"
 
-    await m.reply_text(text)
+    await m.reply_text(text, disable_web_page_preview=True)
 
 
 @Korone.on_message(
