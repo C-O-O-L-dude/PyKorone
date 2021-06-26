@@ -94,8 +94,7 @@ async def on_all_m(c: Korone, m: Message):
 @Korone.on_message(~filters.private & ~filters.edited & filters.text, group=5)
 async def on_text_m(c: Korone, m: Message):
     length = len(m.text)
-    await Rank_not.get_or_create(chat_id=m.chat.id)
-    notify = await Rank_not.get_or_none(chat_id=m.chat.id)
+    notify = (await Rank_not.get_or_create(chat_id=m.chat.id))[0].value
     now_date = datetime.now().replace(tzinfo=timezone.utc)
 
     user_db = (
@@ -143,11 +142,11 @@ async def on_text_m(c: Korone, m: Message):
                         current_level += 1
                         next_level = current_level + 1
                         next_level_xp = LEVELS_GROUP[str(next_level)]
-                    if notify.value == "True":
+                    if notify is True:
                         await m.reply_text(
                             f"Parabéns {m.from_user.mention()}! Você subiu para o nível <b>{current_level}</b> (grupo) <code>{current_xp}</code>/<code>{next_level_xp}</code>."
                         )
-                elif notify.value == "True":
+                elif notify is True:
                     await m.reply_text(
                         f"Parabéns {m.from_user.mention()}! Você chegou ao último nível (até o momento) <code>{current_level}</code> (grupo)."
                     )
@@ -170,11 +169,11 @@ async def on_text_m(c: Korone, m: Message):
                 next_level = current_level + 1
                 if str(next_level) in LEVELS_GLOBAL.keys():
                     next_level_xp = LEVELS_GLOBAL[str(next_level)]
-                    if notify.value == "True":
+                    if notify is True:
                         await m.reply_text(
                             f"Parabéns {m.from_user.mention()}! Você subiu para o nível <b>{current_level}</b> (global) <code>{current_xp}</code>/<code>{next_level_xp}</code>."
                         )
-                elif notify.value == "True":
+                elif notify is True:
                     await m.reply_text(
                         f"Parabéns {m.from_user.mention()}! Você chegou ao último nível (até o momento) <code>{current_level}</code> (global)."
                     )

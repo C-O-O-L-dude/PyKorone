@@ -34,7 +34,7 @@ GROUP = "ranking"
 
 COMMANDS_HELP[GROUP]: Dict = {
     "name": "Ranking",
-    "text": "Comando relacionado ao meu sistema de ranks, níveis e XPs.",
+    "text": "Comandos relacionados ao meu sistema de ranking, níveis e XP.",
     "commands": {},
     "help": True,
 }
@@ -128,9 +128,17 @@ async def ranking_global(c: Korone, m: Message):
 async def ranking_notify(c: Korone, m: Message):
     config = await Rank_not.get_or_none(chat_id=m.chat.id)
     keyboard = [
-        [("✅ Ativado" if config.value == "True" else "☑️ Desativado", "rank_togle")]
+        [
+            (
+                "✅ Ativado" if config.value is True else "☑️ Desativado",
+                "rank_togle",
+            )
+        ]
     ]
-    await m.reply_text("Notificações de level up.", reply_markup=c.ikb(keyboard))
+    await m.reply_text(
+        f"Notificações de level para o grupo {html.escape(m.chat.title)}.",
+        reply_markup=c.ikb(keyboard),
+    )
 
 
 @Korone.on_callback_query(filters.regex("^rank_togle"))
@@ -139,18 +147,30 @@ async def rank_togle(c: Korone, cq: CallbackQuery):
         chat_id=cq.message.chat.id, user_id=cq.from_user.id
     )
     if member.status not in ["administrator", "creator"]:
-        return await cq.answer("Este botão não é para você!", cache_time=60)
+        await cq.answer(
+            "Este botão é apenas para os administradores do grupo!",
+            show_alert=True,
+            cache_time=60,
+        )
+        return
+
     config = await Rank_not.get_or_none(chat_id=cq.message.chat.id)
-    if config.value == "True":
-        config.update_from_dict({"value": False})
+    if config.value is True:
+        config.update_from_dict({"value": 0})
         await config.save()
-    elif config.value == "False":
-        config.update_from_dict({"value": True})
+    elif config.value is False:
+        config.update_from_dict({"value": 1})
         await config.save()
 
     keyboard = [
-        [("✅ Ativado" if config.value == "True" else "☑️ Desativado", "rank_togle")]
+        [
+            (
+                "✅ Ativado" if config.value is True else "☑️ Desativado",
+                "rank_togle",
+            )
+        ]
     ]
     await cq.message.edit_text(
-        "Notificações de level up.", reply_markup=c.ikb(keyboard)
+        f"Notificações de level para o grupo {html.escape(cq.message.chat.title)}.",
+        reply_markup=c.ikb(keyboard),
     )

@@ -28,7 +28,7 @@ class Chats(Model):
 
 class Rank_not(Model):
     chat_id = fields.IntField(pk=True)
-    value = fields.CharField(max_length=255, default="False")
+    value = fields.BooleanField(default=False)
 
 
 class Users(Model):
